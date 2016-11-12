@@ -1,5 +1,5 @@
 {
-  "name": "es6-starter",
+  "name": "lab-5",
   "version": "1.0.0",
   "description": "Starter for building es6 apps in local environment",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "watch": "webpack --watch",
     "start": "webpack-dev-server --watch --hot --inline"
   },
-  "author": "Brian Gillespie",
+  "author": "Stephen Fox",
   "license": "ISC",
   "dependencies": {
     "rxjs": "^5.0.0-rc.2"

@@ -1,10 +1,10 @@
 import {Observable} from 'rxjs/RX';
 
-var currentCalculation = {value: ''};
+window.onload = function() {
+  initiliaze();
+}
 
-/**
- * Subscribe mouse clicks and keydowns for the calculator.
- */
+/// Subscribe mouse clicks and keydowns for the calculator. 
 const initiliaze = () => {
   var buttons = document.getElementsByTagName('button');
   buttons = [].slice.call(buttons); // Convert buttons to array so we can map
@@ -13,7 +13,7 @@ const initiliaze = () => {
   
   // All calculator events
   const buttonPresses = buttons.map(button => { return Observable.fromEvent(button, 'click')}) 
-  const keyboardPresses = Observable.fromEvent(input, 'keydown').map(e => { e.target.value });
+  const keyboardPresses = Observable.fromEvent(document, 'keydown');
    
   //  All rxjs events from keyboard and buttons.
   var events = Observable.from(buttonPresses.concat(keyboardPresses)).mergeAll();
@@ -24,10 +24,20 @@ const initiliaze = () => {
 // Calculator object.
 const calculator = {
   inputScreen: {},
+  valueFromEvent: function(event) {
+    if (event instanceof KeyboardEvent) {
+      return event.key;
+    } else if (event instanceof MouseEvent){
+      return event.target.innerHTML;
+    } else {
+      return null;
+    }
+  },
   handleInput: function(event) {
-    var value = event.target.innerHTML;
+    var value = this.valueFromEvent(event) || '';
     switch(value) {
       case 'C':
+      case 'c':
         this.clear();
         break;
       case '=':
@@ -36,12 +46,35 @@ const calculator = {
       case '±':
         this.flip();
         break;
-      default:
+      case 'Backspace':
+        this.backspace();
+        break;
+      case 'Enter':
+        this.showResult();
+        break;
+      case 'x': // All extra keyboard inputs allowed. 
+      case "*":
+      case '+':
+      case '-':
+      case '/':
+      case '(':
+      case ')':
+      case '.':
         this.updateInput(value);
+        break;
+      default: // Check numbers for the rest.
+        if (value.match(/[a-zA-Z]+/)) { 
+          break;
+        }
+        var number = Number(value);
+        this.updateInput(number);
     }
   },
   updateInput: function(value) {
     this.inputScreen.value += value;
+  },
+  backspace: function() {
+    this.inputScreen.value = this.inputScreen.value.slice(0, -1);
   },
   flip: function() {
     this.inputScreen.value = this.inputScreen.value * -1;
@@ -60,44 +93,6 @@ const calculator = {
 }
 
 
-// function flip() {
-//   var input = document.getElementsByTagName('input')[0];
-//   var value = input.value * -1
-//   input.value = value
-// }
 
-
-// function showResult() {
-//   var input = document.getElementsByTagName('input')[0];
-//   var inputValue = input.value;
-
-  
-//   inputValue = inputValue.replace('x', '*');
-//   inputValue = inputValue.replace();
-//   var result = eval(inputValue);
-//   input.value = result;
-// }
-
-// function clear() {
-//   var input = document.getElementsByTagName('input')[0];
-//   input.value = '';
-// }
-
-window.onload = function() {
-  initiliaze();
-
-  // document.addEventListener('keydown', function(event) {
-  //   console.log(event.keyCode);
-  //   switch(event.keyCode) {
-  //     case 67: // c key
-  //       clear();
-  //       break;
-  //     case 13: // enter key
-  //     case 187:
-  //       showResult();
-  //       break;
-  //   }
-  // }, false);
-}
 
 
