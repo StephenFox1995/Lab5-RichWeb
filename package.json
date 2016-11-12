@@ -4,11 +4,14 @@
   "description": "Starter for building es6 apps in local environment",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "start": "webpack-dev-server --watch --hot --inline"
   },
   "author": "Brian Gillespie",
   "license": "ISC",
   "dependencies": {
+    "rxjs": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "babel-core": "^6.17.0",
@@ -19,12 +22,9 @@
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.16.1"
   },
-  "scripts": {
-    "build": "webpack",
-    "watch": "webpack --watch",
-    "start": "webpack-dev-server --watch --hot --inline"
-  },
   "babel": {
-    "presets": ["es2015"]
+    "presets": [
+      "es2015"
+    ]
   }
 }
