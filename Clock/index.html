@@ -1,23 +1,36 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <script type="text/javascript" src="bundle.js" charset="utf-8"></script>
   <link rel="stylesheet" type="text/css" href="style.css">
-  <title>Insert Title Here</title>
+  <title>Stopwatch</title>
 </head>
+
 <body>
 </body>
-<canvas id="stopwatch"> 
+<div class="container">
+  <canvas id="stopwatch" width="200" height="200">
+  </canvas>
 
-</canvas>
-<div id="digital"></div>
-<div id="row">
-  <button id="start">Start</button>
-  <button id="stop">Stop</button>
-  <button id="split">Split</button>
-  <button id="reset">Reset</button>
+  <div id="digital">
+    00:00:0
+  </div>
+  
+  <!--start, stop, split and reset-->
+  <div id="button-row">
+    <button id="start">Start</button>
+    <button id="stop">Stop</button>
+    <button id="split">Split</button>
+    <button id="reset">Reset</button>
+  </div>
+  
+  <div id="split-container">
+    <div class="title">Splits</div>
+    <div class="rows"></div>
+  </div>
 </div>
+
 </html>
-<!--start, stop, split and reset-->
