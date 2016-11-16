@@ -11,7 +11,7 @@
   "author": "Stephen Fox",
   "license": "ISC",
   "dependencies": {
-    "rxjs": "^5.0.0-rc.2"
+    "@reactivex/rxjs": "^5.0.0-rc.3"
   },
   "devDependencies": {
     "babel-core": "^6.17.0",

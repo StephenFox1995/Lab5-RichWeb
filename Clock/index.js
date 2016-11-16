@@ -1,17 +1,18 @@
-import {Observable} from 'rxjs/RX';
-import {Subject} from 'rxjs/RX';
+import { Observable } from '@reactivex/rxjs';
+import { Subject } from '@reactivex/rxjs';
 
-window.onload = function() {
+window.onload = function () {
   initialize();
 }
 
-const initialize = function() {
+const initialize = function () {
+  
   var canvas = document.getElementById("stopwatch");
   var ctx = canvas.getContext("2d");
   var radius = canvas.height / 2;
   ctx.translate(radius, radius);
   radius = radius * 0.90
-  
+
   stopwatch.ctx = ctx;
   stopwatch.radius = radius;
   stopwatch.canvas = canvas;
@@ -39,15 +40,15 @@ var Timer = {
   time: Date,
   subscription: {},
   pauser: Subject,
-  start: function(interval, cb) {
+  start: function (interval, cb) {
     this.pauser = new Subject();
     this.started = true;
     this.time = new Date();
     this.time.setSeconds(0);
     this.time.setMinutes(0);
     this.time.setHours(0);
-    
-    var pauser = new Subject();       
+
+    var pauser = new Subject();
     this.subscription = Observable
       .interval(interval)
       .timeInterval()
@@ -57,10 +58,10 @@ var Timer = {
         cb(this.time);
       });
   },
-  pause: function() {
-    pauser.onNext(false);
+  pause: function () {
+    this.pauser.next(false);
   },
-  stop: function() {
+  stop: function () {
     this.subscription.unsubscribe();
   }
 }
@@ -74,7 +75,7 @@ const stopwatch = {
   context: {},
   started: false,
   splits: [],
-  start: function() {
+  start: function () {
     if (this.started) {
       return;
     } else {
@@ -89,16 +90,16 @@ const stopwatch = {
       });
   },
 
-  stop: function() {
+  stop: function () {
     this.started = false;
     this.timer.pause();
   },
 
-  reset: function() {
+  reset: function () {
     this.splits = [];
     const splitContainer = document.getElementById("split-container");
     const rows = splitContainer.getElementsByClassName("rows")[0];
-    while(rows.firstChild) {
+    while (rows.firstChild) {
       rows.removeChild(rows.firstChild); // Remove all rows.
     }
     this.drawClock();
@@ -106,7 +107,7 @@ const stopwatch = {
     digital.innerHTML = "00:00:0"
   },
 
-  split: function() {
+  split: function () {
     const splitTime = this.humanReadableTime(this.timer.time);
     this.splits.push(splitTime);
     const splitContainer = document.getElementById("split-container");
@@ -125,31 +126,25 @@ const stopwatch = {
     }
   },
 
-  drawClock: function (time=null) {
+  drawClock: function (time = null) {
     this.drawFace();
     this.drawNumbers();
     this.drawTime(time);
   },
 
-  humanReadableTime: function(time) {
-    return time.toISOString().slice(14,21);
+  humanReadableTime: function (time) {
+    return time.toISOString().slice(14, 21);
   },
 
   drawFace: function () {
-    var grad = null;
     this.ctx.beginPath();
     this.ctx.arc(0, 0, this.radius, 0, 2 * Math.PI);
     this.ctx.fillStyle = 'white';
     this.ctx.fill();
-    grad = this.ctx.createRadialGradient(0, 0, this.radius * 0.95, 0, 0, this.radius * 1.05);
-    grad.addColorStop(0, '#333');
-    grad.addColorStop(0.5, 'white');
-    grad.addColorStop(1, '#333');
-    this.ctx.strokeStyle = grad;
-    this.ctx.lineWidth = this.radius * 0.1;
+    this.ctx.lineWidth = this.radius * 0.03;
     this.ctx.stroke();
     this.ctx.beginPath();
-    this.ctx.arc(0, 0, this.radius * 0.1, 0, 2 * Math.PI);
+    this.ctx.arc(0, 0, this.radius * 0.05, 0, 2 * Math.PI);
     this.ctx.fillStyle = '#333';
     this.ctx.fill();
   },
@@ -160,19 +155,26 @@ const stopwatch = {
     this.ctx.font = this.radius * 0.15 + "px arial";
     this.ctx.textBaseline = "middle";
     this.ctx.textAlign = "center";
-    for (num = 1; num < 13; num++) {
-      ang = num * Math.PI / 6;
-      this.ctx.rotate(ang);
-      this.ctx.translate(0, -this.radius * 0.85);
-      this.ctx.rotate(-ang);
-      this.ctx.fillText("-", 0, 0);
-      this.ctx.rotate(ang);
-      this.ctx.translate(0, this.radius * 0.85);
-      this.ctx.rotate(-ang);
+    for (var i = 0; i < 12; i++) { // Hours
+      this.ctx.beginPath();
+      this.ctx.rotate(Math.PI / 6);
+      this.ctx.moveTo(90, 0);
+      this.ctx.lineTo(80, 0);
+      this.ctx.stroke();
+    }
+    this.ctx.lineWidth = this.radius * 0.01;
+    for (i = 0; i < 60; i++) {
+      if (i % 5 != 0) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(85, 0);
+        this.ctx.lineTo(80, 0);
+        this.ctx.stroke();
+      }
+      this.ctx.rotate(Math.PI / 30);
     }
   },
 
-  drawTime: function (time=null) {
+  drawTime: function (time = null) {
     var hour = 0;
     var minute = 0;
     var second = 0;
@@ -182,21 +184,21 @@ const stopwatch = {
       minute = time.getMinutes();
       second = time.getSeconds();
     }
-    
+
     //hour
     hour = hour % 12;
     hour = (hour * Math.PI / 6) +
       (minute * Math.PI / (6 * 60)) +
       (second * Math.PI / (360 * 60));
-    this.drawHand(this.ctx, hour, this.radius * 0.5, this.radius * 0.07);
-    //minute
+    this.drawHand(this.ctx, hour, this.radius * 0.3, this.radius * 0.07);
+    //minute 
     minute = ((minute * Math.PI) / 30) + ((second * Math.PI) / (30 * 60));
     this.drawHand(this.ctx, minute, this.radius * 0.8, this.radius * 0.07);
-    // second
+    //second
     second = (second * Math.PI / 30);
     this.drawHand(this.ctx, second, this.radius * 0.9, this.radius * 0.02);
   },
-  
+
   drawHand: function (ctx, pos, length, width) {
     ctx.beginPath();
     ctx.lineWidth = width;
