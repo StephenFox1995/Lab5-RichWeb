@@ -1,12 +1,12 @@
-import { Observable } from '@reactivex/rxjs';
-import { Subject } from '@reactivex/rxjs';
+import { Observable } from 'rxjs/rx';
+import { Subject } from 'rxjs/rx';
 
 window.onload = function () {
   initialize();
 }
 
 const initialize = function () {
-  
+
   var canvas = document.getElementById("stopwatch");
   var ctx = canvas.getContext("2d");
   var radius = canvas.height / 2;
@@ -39,30 +39,41 @@ const addStreams = () => {
 var Timer = {
   time: Date,
   subscription: {},
-  pauser: Subject,
+  stopped : false,
+  started: false,
   start: function (interval, cb) {
-    this.pauser = new Subject();
-    this.started = true;
-    this.time = new Date();
-    this.time.setSeconds(0);
-    this.time.setMinutes(0);
-    this.time.setHours(0);
+    if (this.stopped) {
+      return;
+    } else {
+      this.started = true;
+      this.time = new Date();
+      this.time.setSeconds(0);
+      this.time.setMinutes(0);
+      this.time.setHours(0);
 
-    var pauser = new Subject();
-    this.subscription = Observable
+      this.timeSource = Observable
       .interval(interval)
       .timeInterval()
-      .share()
       .subscribe((total) => {
+        if (this.stopped) { // if stopped, stop sending stream updates.
+          return;
+        }
         this.time.setMilliseconds(this.time.getMilliseconds() + 100);
         cb(this.time);
       });
+    }   
   },
-  pause: function () {
-    this.pauser.next(false);
+
+  resume: function() {
+    this.stopped = false;
   },
   stop: function () {
-    this.subscription.unsubscribe();
+    this.stopped = true;
+  },
+  reset: function () {
+    this.stopped = false;
+    this.started = false;
+    this.timeSource.unsubscribe();
   }
 }
 
@@ -74,28 +85,36 @@ const stopwatch = {
   canvas: {},
   context: {},
   started: false,
+  stopped: false,
   splits: [],
   start: function () {
-    if (this.started) {
+    if (this.started && this.stopped) { // Paused state
+      this.timer.resume();
+    } else if (this.started) { // Currently running.
       return;
-    } else {
+    } else { // Reset/ initial statethis.started = true;
       this.started = true;
+      this.stopped = false;
+      this.timer = Object.create(Timer);
+      var digital = document.getElementById('digital');
+      this.timer.start(100,
+        time => {
+          digital.innerHTML = this.humanReadableTime(time);
+          this.drawClock(time);
+        });
     }
-    this.timer = Object.create(Timer);
-    var digital = document.getElementById('digital');
-    this.timer.start(100,
-      time => {
-        digital.innerHTML = this.humanReadableTime(time);
-        this.drawClock(time);
-      });
   },
 
   stop: function () {
-    this.started = false;
-    this.timer.pause();
+    this.stopped = true;
+    this.timer.stop();
   },
 
   reset: function () {
+    // Only when stopped can the clock be reset.
+    if (!this.stopped) {
+      return;
+    }
     this.splits = [];
     const splitContainer = document.getElementById("split-container");
     const rows = splitContainer.getElementsByClassName("rows")[0];
