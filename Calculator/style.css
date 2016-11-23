@@ -35,3 +35,7 @@ button {
   margin-right: auto;
   font-family: Verdana;
 }
+
+#info {
+  text-align: center;
+}
