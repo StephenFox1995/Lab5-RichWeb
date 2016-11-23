@@ -86,15 +86,17 @@ const stopwatch = {
   context: {},
   started: false,
   stopped: false,
+  isReset: false,
   splits: [],
   start: function () {
-    if (this.started && this.stopped) { // Paused state
+    if (this.started && this.stopped && !this.isReset) { // Paused state
       this.timer.resume();
-    } else if (this.started) { // Currently running.
+    } else if (this.started && !this.isReset) { // Currently running.
       return;
     } else { // Reset/ initial statethis.started = true;
       this.started = true;
       this.stopped = false;
+      this.isReset = false;
       this.timer = Object.create(Timer);
       var digital = document.getElementById('digital');
       this.timer.start(100,
@@ -123,7 +125,9 @@ const stopwatch = {
     }
     this.drawClock();
     var digital = document.getElementById('digital');
-    digital.innerHTML = "00:00:0"
+    digital.innerHTML = "00:00:0";
+    this.isReset = true;
+    this.timer.reset();
   },
 
   split: function () {
