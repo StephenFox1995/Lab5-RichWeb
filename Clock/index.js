@@ -6,7 +6,6 @@ window.onload = function () {
 }
 
 const initialize = function () {
-
   var canvas = document.getElementById("stopwatch");
   var ctx = canvas.getContext("2d");
   var radius = canvas.height / 2;
@@ -151,7 +150,7 @@ const stopwatch = {
 
   drawClock: function (time = null) {
     this.drawFace();
-    this.drawNumbers();
+    this.drawTicks();
     this.drawTime(time);
   },
 
@@ -172,11 +171,9 @@ const stopwatch = {
     this.ctx.fill();
   },
 
-  drawNumbers: function () {
+  drawTicks: function () {
     var ang;
     var num;
-    this.ctx.font = this.radius * 0.15 + "px arial";
-    this.ctx.textBaseline = "middle";
     this.ctx.textAlign = "center";
     for (var i = 0; i < 12; i++) { // Hours
       this.ctx.beginPath();
